@@ -29,8 +29,28 @@ export async function POST(req: NextRequest) {
       throw new ValidationError('No file provided');
     }
 
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+    const fileSize = file.size;
+
+    if (fileSize > MAX_FILE_SIZE) {
+      throw new ValidationError('File size exceeds 50MB limit');
+    }
+
     if (!type || !['IMAGE', 'VIDEO'].includes(type)) {
       throw new ValidationError('Invalid media type');
+    }
+
+    const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+    
+    const fileType = file.type;
+
+    if (type === 'IMAGE' && !allowedImageTypes.includes(fileType)) {
+      throw new ValidationError('Invalid image format. Allowed: JPEG, PNG, WebP, GIF');
+    }
+
+    if (type === 'VIDEO' && !allowedVideoTypes.includes(fileType)) {
+      throw new ValidationError('Invalid video format. Allowed: MP4, WebM, MOV');
     }
 
     const bytes = await file.arrayBuffer();

@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email } = forgotPasswordSchema.parse(body);
 
-    await checkAuthRateLimit(email);
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    await checkAuthRateLimit(ip);
 
     const user = await prisma.user.findUnique({
       where: { email },

@@ -5,6 +5,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
+import { checkAuthRateLimit } from './ratelimit';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -31,12 +32,18 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid credentials');
         }
 
+        await checkAuthRateLimit(credentials.email);
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
         if (!user || !user.password_hash) {
           throw new Error('Invalid credentials');
+        }
+
+        if (!user.emailVerified) {
+          throw new Error('Please verify your email before logging in');
         }
 
         const isPasswordValid = await bcrypt.compare(

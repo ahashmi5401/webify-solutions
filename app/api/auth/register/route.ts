@@ -13,7 +13,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = registerSchema.parse(body);
 
-    await checkAuthRateLimit(validated.email);
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    await checkAuthRateLimit(ip);
     await verifyTurnstileToken(validated.turnstileToken);
 
     const existingUser = await prisma.user.findUnique({

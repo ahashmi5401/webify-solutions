@@ -62,7 +62,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = inquirySchema.parse(body);
 
-    await checkContactRateLimit(validated.email);
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    await checkContactRateLimit(ip);
     await verifyTurnstileToken(validated.turnstileToken);
 
     const session = await getServerSession(authOptions);

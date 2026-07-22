@@ -9,6 +9,8 @@ import { checkPublicApiRateLimit } from '@/lib/ratelimit';
 
 export async function GET(req: NextRequest) {
   try {
+    await checkPublicApiRateLimit(req.headers.get('x-forwarded-for') || 'unknown');
+
     const { searchParams } = new URL(req.url);
     const query = courseQuerySchema.parse(Object.fromEntries(searchParams));
 
@@ -29,19 +31,39 @@ export async function GET(req: NextRequest) {
       ];
     }
 
+    const session = await getServerSession(authOptions);
+    const userId = session?.user ? (session.user as any).id : null;
+    const userRole = session?.user ? (session.user as any).role : null;
+
+    const isAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
+
     const [courses, total] = await Promise.all([
       prisma.course.findMany({
         where: { ...where, isPublished: true },
         include: {
           modules: {
             include: {
-              lessons: true,
+              lessons: {
+                select: {
+                  id: true,
+                  title: true,
+                  order: true,
+                  isFreePreview: true,
+                  ...(isAdmin ? { content: true, videoUrl: true, duration: true } : {}),
+                },
+              },
             },
             orderBy: { order: 'asc' },
           },
           _count: {
             select: { enrollments: true },
           },
+          ...(userId ? {
+            enrollments: {
+              where: { userId },
+              select: { id: true, status: true },
+            },
+          } : {}),
         },
         skip: (query.page - 1) * query.limit,
         take: query.limit,

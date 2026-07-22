@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ results: [] });
     }
 
-    await checkPublicApiRateLimit('search');
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    await checkPublicApiRateLimit(ip);
 
     const [courses, blogPosts, services, portfolioItems] = await Promise.all([
       prisma.course.findMany({

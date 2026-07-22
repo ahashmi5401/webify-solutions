@@ -6,8 +6,19 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed...');
 
-  // Create Super Admin user
-  const hashedPassword = await bcrypt.hash('Admin123!', 12);
+  // WARNING: This seed script creates a Super Admin user with a default password.
+  // IMPORTANT: Change this password immediately after running the seed script in production!
+  // The default password is: Admin123! (meets complexity requirements: uppercase, lowercase, number, special char)
+  // To use a custom password, set the SEED_ADMIN_PASSWORD environment variable.
+  const defaultPassword = 'Admin123!';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || defaultPassword;
+  
+  if (!process.env.SEED_ADMIN_PASSWORD) {
+    console.warn('⚠️  WARNING: Using default password for Super Admin. Change it immediately in production!');
+    console.warn('   Default credentials: admin@webify-solutions.com / Admin123!');
+  }
+
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
   
   const superAdmin = await prisma.user.upsert({
     where: { email: 'admin@webify-solutions.com' },

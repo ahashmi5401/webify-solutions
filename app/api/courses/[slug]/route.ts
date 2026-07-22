@@ -11,12 +11,25 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user ? (session.user as any).id : null;
+    const userRole = session?.user ? (session.user as any).role : null;
+
+    const isAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
+
     const course = await prisma.course.findUnique({
       where: { slug: params.slug },
       include: {
         modules: {
           include: {
             lessons: {
+              select: {
+                id: true,
+                title: true,
+                order: true,
+                isFreePreview: true,
+                ...(isAdmin ? { content: true, videoUrl: true, duration: true } : {}),
+              },
               orderBy: { order: 'asc' },
             },
           },
@@ -25,6 +38,12 @@ export async function GET(
         _count: {
           select: { enrollments: true },
         },
+        ...(userId ? {
+          enrollments: {
+            where: { userId },
+            select: { id: true, status: true },
+          },
+        } : {}),
       },
     });
 
@@ -33,10 +52,7 @@ export async function GET(
     }
 
     if (!course.isPublished) {
-      const session = await getServerSession(authOptions);
-      const userRole = session?.user ? (session.user as any).role : null;
-      
-      if (!userRole || userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
+      if (!isAdmin) {
         throw new ForbiddenError('Course not published');
       }
     }
