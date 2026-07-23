@@ -3,7 +3,7 @@ import { z } from 'zod';
 const lessonSchema = z.object({
   title: z.string().min(1, 'Lesson title is required'),
   content: z.string().min(1, 'Lesson content is required'),
-  videoUrl: z.string().url().nullable().optional(),
+  videoUrl: z.string().url().nullable().optional().or(z.literal('')),
   order: z.number().int().nonnegative(),
   isFreePreview: z.boolean().default(false),
 });

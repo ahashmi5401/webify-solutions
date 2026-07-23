@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Container } from "@/components/shared/Container";
 import { EnrollButton } from "@/components/courses/EnrollButton";
+import { LessonContent } from "@/components/courses/LessonContent";
+import { LessonAccordionItem } from "@/components/courses/LessonAccordionItem";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +17,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Lock, PlayCircle, BookOpen, Layers, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Lock, PlayCircle, BookOpen, Layers, CheckCircle2, ArrowLeft, ChevronDown } from "lucide-react";
 import { JsonLd, buildCourseSchema, buildBreadcrumbSchema } from "@/components/shared/JsonLd";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ;
@@ -210,31 +212,16 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="space-y-2 pt-1">
+                    <div className="space-y-3 pt-1">
                       {mod.lessons && mod.lessons.length > 0 ? (
                         mod.lessons.map((lesson: any) => {
                           const canAccess = isEnrolled || lesson.isFreePreview || Boolean(lesson.content);
                           return (
-                            <div
+                            <LessonAccordionItem
                               key={lesson.id}
-                              className="flex items-center justify-between p-2.5 rounded-md border border-border/60 bg-card text-xs"
-                            >
-                              <div className="flex items-center space-x-2.5">
-                                {canAccess ? (
-                                  <PlayCircle className="h-4 w-4 text-primary shrink-0" />
-                                ) : (
-                                  <Lock className="h-4 w-4 text-muted-foreground/60 shrink-0" />
-                                )}
-                                <span className="font-medium text-foreground">{lesson.title}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                {lesson.isFreePreview && (
-                                  <Badge variant="accent" className="text-[10px]">
-                                    Free Preview
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
+                              lesson={lesson}
+                              canAccess={canAccess}
+                            />
                           );
                         })
                       ) : (

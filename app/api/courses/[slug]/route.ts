@@ -29,7 +29,7 @@ export async function GET(
                 title: true,
                 order: true,
                 isFreePreview: true,
-                ...(isAdmin ? { content: true, videoUrl: true, duration: true } : {}),
+                ...(isAdmin ? { content: true, videoUrl: true } : {}),
               },
               orderBy: { order: 'asc' },
             },

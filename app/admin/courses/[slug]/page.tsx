@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,6 +64,7 @@ export default function EditCoursePage() {
   });
 
   const [modules, setModules] = useState<Module[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCourse();
@@ -178,6 +180,7 @@ export default function EditCoursePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
 
     try {
       const courseData = {
@@ -197,10 +200,16 @@ export default function EditCoursePage() {
         body: JSON.stringify(courseData),
       });
 
-      if (!res.ok) throw new Error("Failed to update course");
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMessage = errorData?.error?.message || "Failed to update course";
+        throw new Error(errorMessage);
+      }
 
       router.push("/admin/courses");
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update course";
+      setError(errorMessage);
       console.error("Failed to update course:", error);
     } finally {
       setSaving(false);
@@ -224,6 +233,11 @@ export default function EditCoursePage() {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">

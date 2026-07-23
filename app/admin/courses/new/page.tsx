@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,6 +46,21 @@ interface Lesson {
   isFreePreview: boolean;
 }
 
+interface ValidationErrors {
+  modules: {
+    [key: number]: {
+      title?: string;
+      lessons: {
+        [key: number]: {
+          title?: string;
+          content?: string;
+          videoUrl?: string;
+        };
+      };
+    };
+  };
+}
+
 export default function NewCoursePage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -63,6 +79,9 @@ export default function NewCoursePage() {
   });
 
   const [modules, setModules] = useState<Module[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({ modules: {} });
 
   useEffect(() => {
     // Auto-generate slug from title
@@ -116,6 +135,83 @@ export default function NewCoursePage() {
       [field]: value,
     };
     setModules(updatedModules);
+    
+    // Clear validation error for this field when user starts typing
+    if (field === 'title' || field === 'content' || field === 'videoUrl') {
+      setValidationErrors(prev => ({
+        ...prev,
+        modules: {
+          ...prev.modules,
+          [moduleIndex]: {
+            ...prev.modules[moduleIndex],
+            lessons: {
+              ...prev.modules[moduleIndex]?.lessons,
+              [lessonIndex]: {
+                ...prev.modules[moduleIndex]?.lessons?.[lessonIndex],
+                [field]: undefined,
+              },
+            },
+          },
+        },
+      }));
+    }
+  };
+
+  const handleVideoUrlBlur = (moduleIndex: number, lessonIndex: number, value: string) => {
+    if (!value.trim()) return;
+    
+    // Auto-prepend https:// if missing
+    if (!/^https?:\/\//i.test(value)) {
+      const correctedValue = `https://${value}`;
+      handleUpdateLesson(moduleIndex, lessonIndex, 'videoUrl', correctedValue);
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: ValidationErrors = { modules: {} };
+    let hasErrors = false;
+
+    modules.forEach((module, moduleIndex) => {
+      errors.modules[moduleIndex] = { lessons: {} };
+      
+      // Validate module title
+      if (!module.title.trim()) {
+        errors.modules[moduleIndex].title = 'Module title is required';
+        hasErrors = true;
+      }
+      
+      // Validate lessons
+      module.lessons.forEach((lesson, lessonIndex) => {
+        errors.modules[moduleIndex].lessons[lessonIndex] = {};
+        
+        if (!lesson.title.trim()) {
+          errors.modules[moduleIndex].lessons[lessonIndex].title = 'Lesson title is required';
+          hasErrors = true;
+        }
+        
+        if (!lesson.content.trim()) {
+          errors.modules[moduleIndex].lessons[lessonIndex].content = 'Lesson content is required';
+          hasErrors = true;
+        }
+        
+        // Validate video URL if provided
+        if (lesson.videoUrl && lesson.videoUrl.trim()) {
+          try {
+            new URL(lesson.videoUrl);
+            if (!lesson.videoUrl.startsWith('http://') && !lesson.videoUrl.startsWith('https://')) {
+              errors.modules[moduleIndex].lessons[lessonIndex].videoUrl = 'Video URL must start with http:// or https://';
+              hasErrors = true;
+            }
+          } catch {
+            errors.modules[moduleIndex].lessons[lessonIndex].videoUrl = 'Invalid video URL';
+            hasErrors = true;
+          }
+        }
+      });
+    });
+
+    setValidationErrors(errors);
+    return !hasErrors;
   };
 
   const handleDeleteLesson = (moduleIndex: number, lessonIndex: number) => {
@@ -157,7 +253,16 @@ export default function NewCoursePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      setError('Please fix the errors below before saving.');
+      return;
+    }
+    
     setSaving(true);
+    setError(null);
+    setSuccess(null);
 
     try {
       const courseData = {
@@ -182,11 +287,35 @@ export default function NewCoursePage() {
         body: JSON.stringify(courseData),
       });
 
-      if (!res.ok) throw new Error("Failed to create course");
+      if (!res.ok) {
+        const errorData = await res.json();
+        let errorMessage = "Failed to create course";
+        
+        if (errorData?.error?.message) {
+          errorMessage = errorData.error.message;
+          // Handle specific error messages
+          if (errorMessage.includes('Unique constraint') && errorMessage.includes('slug')) {
+            errorMessage = "A course with this slug already exists. Please choose a different slug.";
+          }
+        } else if (Array.isArray(errorData)) {
+          // Handle Zod validation errors
+          const firstError = errorData[0];
+          if (firstError?.message) {
+            errorMessage = firstError.message;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
 
       const course = await res.json();
-      router.push(`/admin/courses/${course.slug}`);
+      setSuccess("Course created successfully! Redirecting to edit page...");
+      setTimeout(() => {
+        router.push(`/admin/courses/${course.slug}`);
+      }, 1500);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to create course";
+      setError(errorMessage);
       console.error("Failed to create course:", error);
     } finally {
       setSaving(false);
@@ -195,6 +324,16 @@ export default function NewCoursePage() {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      {success && (
+        <Alert variant="default" className="border-green-500/50 text-green-700 dark:text-green-400">
+          <AlertDescription>{success}</AlertDescription>
+        </Alert>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -207,7 +346,7 @@ export default function NewCoursePage() {
             <p className="text-muted-foreground mt-1">Create a new course with its curriculum</p>
           </div>
         </div>
-        <Button onClick={handleSubmit} disabled={saving}>
+        <Button onClick={handleSubmit} disabled={saving || modules.length === 0}>
           <Save className="h-4 w-4 mr-2" />
           {saving ? "Saving..." : "Save Course"}
         </Button>
@@ -347,12 +486,17 @@ export default function NewCoursePage() {
                   {/* Module Header */}
                   <div className="flex items-center space-x-2">
                     <Badge variant="secondary">Module {moduleIndex + 1}</Badge>
-                    <Input
-                      value={module.title}
-                      onChange={(e) => handleUpdateModule(moduleIndex, "title", e.target.value)}
-                      placeholder="Module title"
-                      className="flex-1"
-                    />
+                    <div className="flex-1">
+                      <Input
+                        value={module.title}
+                        onChange={(e) => handleUpdateModule(moduleIndex, "title", e.target.value)}
+                        placeholder="Module title"
+                        className={validationErrors.modules[moduleIndex]?.title ? "border-destructive" : ""}
+                      />
+                      {validationErrors.modules[moduleIndex]?.title && (
+                        <p className="text-xs text-destructive mt-1">{validationErrors.modules[moduleIndex].title}</p>
+                      )}
+                    </div>
                     <div className="flex items-center space-x-1">
                       <Button
                         type="button"
@@ -391,12 +535,17 @@ export default function NewCoursePage() {
                           <Badge variant="outline" className="text-xs">
                             Lesson {lessonIndex + 1}
                           </Badge>
-                          <Input
-                            value={lesson.title}
-                            onChange={(e) => handleUpdateLesson(moduleIndex, lessonIndex, "title", e.target.value)}
-                            placeholder="Lesson title"
-                            className="flex-1 text-sm"
-                          />
+                          <div className="flex-1">
+                            <Input
+                              value={lesson.title}
+                              onChange={(e) => handleUpdateLesson(moduleIndex, lessonIndex, "title", e.target.value)}
+                              placeholder="Lesson title"
+                              className={`text-sm ${validationErrors.modules[moduleIndex]?.lessons[lessonIndex]?.title ? "border-destructive" : ""}`}
+                            />
+                            {validationErrors.modules[moduleIndex]?.lessons[lessonIndex]?.title && (
+                              <p className="text-xs text-destructive mt-1">{validationErrors.modules[moduleIndex].lessons[lessonIndex].title}</p>
+                            )}
+                          </div>
                           <div className="flex items-center space-x-1">
                             <Button
                               type="button"
@@ -433,9 +582,13 @@ export default function NewCoursePage() {
                             <Input
                               value={lesson.videoUrl || ""}
                               onChange={(e) => handleUpdateLesson(moduleIndex, lessonIndex, "videoUrl", e.target.value)}
+                              onBlur={(e) => handleVideoUrlBlur(moduleIndex, lessonIndex, e.target.value)}
                               placeholder="https://youtube.com/watch?v=..."
-                              className="text-sm"
+                              className={`text-sm ${validationErrors.modules[moduleIndex]?.lessons[lessonIndex]?.videoUrl ? "border-destructive" : ""}`}
                             />
+                            {validationErrors.modules[moduleIndex]?.lessons[lessonIndex]?.videoUrl && (
+                              <p className="text-xs text-destructive mt-1">{validationErrors.modules[moduleIndex].lessons[lessonIndex].videoUrl}</p>
+                            )}
                           </div>
                           <div className="flex items-center space-x-2 pt-4">
                             <input
@@ -454,8 +607,11 @@ export default function NewCoursePage() {
                             value={lesson.content}
                             onChange={(e) => handleUpdateLesson(moduleIndex, lessonIndex, "content", e.target.value)}
                             placeholder="Lesson content (markdown supported)..."
-                            className="w-full min-h-[80px] px-3 py-2 text-sm rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            className={`w-full min-h-[80px] px-3 py-2 text-sm rounded-md border bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${validationErrors.modules[moduleIndex]?.lessons[lessonIndex]?.content ? "border-destructive" : "border-input"}`}
                           />
+                          {validationErrors.modules[moduleIndex]?.lessons[lessonIndex]?.content && (
+                            <p className="text-xs text-destructive mt-1">{validationErrors.modules[moduleIndex].lessons[lessonIndex].content}</p>
+                          )}
                         </div>
                       </div>
                     ))}
