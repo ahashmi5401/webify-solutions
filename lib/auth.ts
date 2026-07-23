@@ -101,6 +101,17 @@ export const authOptions: NextAuthOptions = {
               emailVerified: new Date(),
             },
           });
+        } else {
+          // Create new user with default USER role
+          await prisma.user.create({
+            data: {
+              email: user.email!,
+              name: user.name,
+              image: user.image,
+              role: 'USER',
+              emailVerified: new Date(),
+            },
+          });
         }
       }
     },

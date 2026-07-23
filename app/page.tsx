@@ -102,8 +102,8 @@ export default async function HomePage() {
 
   // Build FAQ schema only from real data with question-form headings
   const faqSchemaItems = (faqs.length > 0 ? faqs : [
-    { question: "What technologies does Webify Solutions use for web development?", answer: "We specialize in React 19, Next.js 14, TypeScript, Node.js, Prisma ORM, and PostgreSQL for modern full-stack web applications." },
-    { question: "How long does a custom web development project take?", answer: "Timelines depend on scope. Simple applications take 3–4 weeks, while complex full-stack builds typically span 6–12 weeks." },
+    { question: "What technologies does Webify Solutions work with?", answer: "Our team works across multiple technologies including Java Spring Boot, React 19, Next.js 14, TypeScript, Node.js, Python, PostgreSQL, and cloud platforms like AWS. We're not limited to JavaScript - we build full-stack solutions across various languages and frameworks." },
+    { question: "How long does a custom software development project take?", answer: "Timelines depend on scope and complexity. Simple applications take 3–4 weeks, while enterprise systems and microservices architectures typically span 6–12 weeks or longer." },
   ]).map((faq: any) => ({ question: faq.question, answer: faq.answer }));
 
   return (
@@ -115,15 +115,15 @@ export default async function HomePage() {
         <Container className="text-center max-w-4xl space-y-6">
           <div className="inline-flex items-center space-x-2 rounded-full border border-border bg-card px-3.5 py-1 text-xs font-medium text-muted-foreground shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span>Next.js 14 • React 19 • Enterprise Architecture</span>
+            <span>Full-Stack Development • Java Spring Boot • Enterprise Solutions</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1]">
-            Engineering Modern Web Apps & High-Impact Tech Training
+            Full-Stack Software Development & Enterprise Solutions
           </h1>
 
           <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Webify Solutions designs production-ready full-stack applications, provides custom enterprise software development, and offers expert courses for developers.
+            Software Company specializing in Website Development, eCommerce Websites, Mobile App Development, AI Solutions, Custom Software, ERP Systems & Digital Solutions.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -234,7 +234,7 @@ export default async function HomePage() {
             Built with modern industry-standard technologies
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm font-medium">
-            {["Next.js 14", "React 19", "TypeScript", "PostgreSQL", "Prisma ORM", "Tailwind CSS", "Cloudflare", "Stripe", "Docker"].map((tech) => (
+            {["Java Spring Boot", "Next.js 14", "React 19", "TypeScript", "Node.js", "PostgreSQL", "Python", "Docker", "AWS", "Microservices"].map((tech) => (
               <Badge key={tech} variant="secondary" className="px-3 py-1.5 text-xs font-mono">
                 {tech}
               </Badge>
@@ -431,15 +431,15 @@ export default async function HomePage() {
           ) : (
             <Accordion>
               <AccordionItem defaultOpen>
-                <AccordionTrigger>What technologies do you use for web development?</AccordionTrigger>
+                <AccordionTrigger>What technologies does your team work with?</AccordionTrigger>
                 <AccordionContent>
-                  We specialize in modern web technologies including React 19, Next.js 14, TypeScript, Node.js, Prisma ORM, and PostgreSQL.
+                  Our team works across multiple technologies including Java Spring Boot, React 19, Next.js 14, TypeScript, Node.js, Python, PostgreSQL, and cloud platforms like AWS. We're not limited to JavaScript - we build full-stack solutions across various languages and frameworks.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem>
-                <AccordionTrigger>How long does a custom project take?</AccordionTrigger>
+                <AccordionTrigger>How long does a custom software development project take?</AccordionTrigger>
                 <AccordionContent>
-                  Timelines depend on scope. Simple applications take 3-4 weeks, while complex full-stack builds typically span 6-12 weeks.
+                  Timelines depend on scope and complexity. Simple applications take 3-4 weeks, while enterprise systems and microservices architectures typically span 6-12 weeks or longer.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

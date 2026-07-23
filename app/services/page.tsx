@@ -32,10 +32,10 @@ export default async function ServicesPage() {
         <div className="space-y-2 max-w-3xl">
           <Badge variant="accent">Development Services</Badge>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-            Custom Software & Engineering Solutions
+            Full-Stack Software & Enterprise Solutions
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            We partner with startups, agencies, and enterprises to build fast, scalable, type-safe web and mobile applications using modern full-stack architectures.
+            We partner with startups, agencies, and enterprises to build comprehensive software solutions across multiple technologies including Java Spring Boot, React, Next.js, Python, and more. From web applications to enterprise systems, we deliver robust, scalable solutions.
           </p>
         </div>
 

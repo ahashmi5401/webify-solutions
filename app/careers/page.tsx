@@ -46,6 +46,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+
 async function getCareerListings() {
   try {
     const { getCareerListings } = await import('@/lib/data/careers');

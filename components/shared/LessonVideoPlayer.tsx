@@ -17,7 +17,7 @@ export function LessonVideoPlayer({ videoUrl, className }: LessonVideoPlayerProp
     return (
       <div className={cn("relative w-full aspect-video rounded-lg overflow-hidden bg-black", className)}>
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}`}
+          src={`https://www.youtube-nocookie.com/embed/${videoId}`}
           title="YouTube video player"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen

@@ -13,6 +13,7 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { JsonLd, buildBreadcrumbSchema } from "@/components/shared/JsonLd";
+import { ShareButton } from "@/components/blog/ShareButton";
 import { 
   ArrowLeft, 
   Calendar, 
@@ -184,14 +185,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
             {/* Share Buttons */}
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Share:</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-8 w-8 p-0"
-                onClick={() => navigator.clipboard.writeText(`${SITE_URL}/blog/${post.slug}`)}
-              >
-                <Link2 className="h-4 w-4" />
-              </Button>
+              <ShareButton url={`${SITE_URL}/blog/${post.slug}`} />
             </div>
           </div>
 

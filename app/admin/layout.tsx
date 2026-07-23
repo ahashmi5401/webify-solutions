@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
@@ -82,8 +82,8 @@ export default function AdminLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
 
   React.useEffect(() => {
     if (status === "unauthenticated") {

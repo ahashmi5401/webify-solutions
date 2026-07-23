@@ -1,4 +1,6 @@
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export interface BlogQueryParams {
   page?: number;
@@ -73,7 +75,7 @@ export async function getBlogPosts(params: BlogQueryParams = {}) {
 }
 
 export async function getBlogPostBySlug(slug: string) {
-  return prisma.blogPost.findUnique({
+  const post = await prisma.blogPost.findUnique({
     where: { slug },
     include: {
       author: {
@@ -85,4 +87,19 @@ export async function getBlogPostBySlug(slug: string) {
       },
     },
   });
+
+  if (!post) {
+    return null;
+  }
+
+  if (!post.isPublished) {
+    const session = await getServerSession(authOptions);
+    const userRole = session?.user ? (session.user as any).role : null;
+    
+    if (!userRole || (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN')) {
+      return null;
+    }
+  }
+
+  return post;
 }

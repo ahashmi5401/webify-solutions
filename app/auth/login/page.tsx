@@ -68,7 +68,23 @@ function LoginForm() {
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
-    await signIn("google", { callbackUrl: callbackUrl || "/dashboard" });
+    const result = await signIn("google", { redirect: false });
+    
+    if (result?.ok) {
+      const session = await getSession();
+      const userRole = (session?.user as any)?.role;
+      
+      if (callbackUrl) {
+        router.push(callbackUrl);
+      } else if (userRole === "SUPER_ADMIN" || userRole === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    } else {
+      setGoogleLoading(false);
+      setErrorMsg("Google login failed. Please try again.");
+    }
   };
 
   return (
