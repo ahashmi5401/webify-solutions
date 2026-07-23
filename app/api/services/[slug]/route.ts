@@ -8,11 +8,12 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const service = await prisma.service.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
     });
 
     if (!service) {
@@ -37,9 +38,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -53,7 +55,7 @@ export async function PATCH(
     const validated = updateServiceSchema.parse(body);
 
     const service = await prisma.service.update({
-      where: { slug: params.slug },
+      where: { slug },
       data: validated,
     });
 
@@ -66,9 +68,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -79,7 +82,7 @@ export async function DELETE(
     requireAdminOrAbove(userRole);
 
     await prisma.service.delete({
-      where: { slug: params.slug },
+      where: { slug },
     });
 
     return NextResponse.json({ message: 'Service deleted successfully' });

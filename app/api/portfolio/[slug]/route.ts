@@ -8,11 +8,12 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const portfolio = await prisma.portfolio.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
     });
 
     if (!portfolio) {
@@ -37,9 +38,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -55,7 +57,7 @@ export async function PATCH(
     const validated = updatePortfolioSchema.parse(body);
 
     const portfolio = await prisma.portfolio.update({
-      where: { slug: params.slug },
+      where: { slug },
       data: validated,
     });
 
@@ -68,9 +70,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -83,7 +86,7 @@ export async function DELETE(
     }
 
     await prisma.portfolio.delete({
-      where: { slug: params.slug },
+      where: { slug },
     });
 
     return NextResponse.json({ message: 'Portfolio item deleted successfully' });

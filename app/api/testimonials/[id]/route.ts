@@ -8,11 +8,12 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const testimonial = await prisma.testimonial.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!testimonial) {
@@ -37,9 +38,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -55,7 +57,7 @@ export async function PATCH(
     const validated = updateTestimonialSchema.parse(body);
 
     const testimonial = await prisma.testimonial.update({
-      where: { id: params.id },
+      where: { id },
       data: validated,
     });
 
@@ -68,9 +70,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -83,7 +86,7 @@ export async function DELETE(
     }
 
     await prisma.testimonial.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Testimonial deleted successfully' });

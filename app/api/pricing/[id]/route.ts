@@ -8,11 +8,12 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const pricingPlan = await prisma.pricingPlan.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!pricingPlan) {
@@ -28,9 +29,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -46,7 +48,7 @@ export async function PATCH(
     const validated = updatePricingPlanSchema.parse(body);
 
     const pricingPlan = await prisma.pricingPlan.update({
-      where: { id: params.id },
+      where: { id },
       data: validated,
     });
 
@@ -59,9 +61,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -74,7 +77,7 @@ export async function DELETE(
     }
 
     await prisma.pricingPlan.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Pricing plan deleted successfully' });

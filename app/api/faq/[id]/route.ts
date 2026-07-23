@@ -8,11 +8,12 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const faq = await prisma.fAQ.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!faq) {
@@ -28,9 +29,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -46,7 +48,7 @@ export async function PATCH(
     const validated = updateFaqSchema.parse(body);
 
     const faq = await prisma.fAQ.update({
-      where: { id: params.id },
+      where: { id },
       data: validated,
     });
 
@@ -59,9 +61,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -74,7 +77,7 @@ export async function DELETE(
     }
 
     await prisma.fAQ.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'FAQ deleted successfully' });

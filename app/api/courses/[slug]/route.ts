@@ -8,9 +8,10 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const session = await getServerSession(authOptions);
     const userId = session?.user ? (session.user as any).id : null;
     const userRole = session?.user ? (session.user as any).role : null;
@@ -18,7 +19,7 @@ export async function GET(
     const isAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
 
     const course = await prisma.course.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
       include: {
         modules: {
           include: {
@@ -66,9 +67,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -82,7 +84,7 @@ export async function PATCH(
     const validated = updateCourseSchema.parse(body);
 
     const course = await prisma.course.update({
-      where: { slug: params.slug },
+      where: { slug },
       data: validated,
     });
 
@@ -95,9 +97,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -108,7 +111,7 @@ export async function DELETE(
     requireAdminOrAbove(userRole);
 
     await prisma.course.delete({
-      where: { slug: params.slug },
+      where: { slug },
     });
 
     return NextResponse.json({ message: 'Course deleted successfully' });

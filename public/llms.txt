@@ -1,0 +1,64 @@
+# Webify Solutions
+
+Webify Solutions is a full-stack web development company and educational platform that provides custom software development services and expert-led online courses.
+
+## Company Overview
+
+Webify Solutions builds production-ready full-stack web applications and delivers expert Next.js, React, and TypeScript courses. The company partners with startups, agencies, and enterprises to build fast, scalable, type-safe web and mobile applications using modern full-stack architectures.
+
+## Services
+
+- Custom Software Development
+- Full-Stack Web Application Development
+- Frontend Development (React, Next.js, TypeScript)
+- Backend Development (Node.js, PostgreSQL, Prisma)
+- API Development & Integration
+- E-commerce Solutions
+- SaaS Application Development
+- Performance Optimization
+- Cloud Deployment & DevOps
+
+## Courses
+
+Webify Solutions offers expert-led online courses covering:
+- React Development
+- Next.js 14 App Router
+- TypeScript
+- Full-Stack Architecture
+- Database Design with PostgreSQL
+- API Development
+- Testing & Quality Assurance
+- Deployment & CI/CD
+
+## Technology Stack
+
+- Frontend: Next.js 14, React 19, TypeScript, Tailwind CSS
+- Backend: Node.js, Express, Prisma ORM
+- Database: PostgreSQL
+- Authentication: NextAuth.js
+- Deployment: Vercel, Docker
+- Testing: Jest, Playwright
+- Version Control: Git
+
+## Contact
+
+- Website: https://webify-solutions.vercel.app
+- Email: hello@webify-solutions.com
+- Location: Remote-First Worldwide
+
+## Key Differentiators
+
+- Production-ready code quality
+- 100% code ownership for clients
+- Transparent pricing with no hidden fees
+- Modern tech stack expertise
+- Comprehensive testing and security
+- Ongoing support and maintenance options
+
+## Target Audience
+
+- Startups seeking MVP development
+- Enterprises requiring custom software solutions
+- Developers learning modern web technologies
+- Businesses needing technical consultation
+- Teams looking for training and upskilling

@@ -1,0 +1,67 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Save } from "lucide-react";
+
+export default function NewServicePage() {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({ title: "", slug: "", description: "", priceRange: "", icon: "", isActive: true });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch("/api/services", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error("Failed to create service");
+      const service = await res.json();
+      router.push(`/admin/services/${service.slug}`);
+    } catch (error) {
+      console.error("Failed to create service:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" onClick={() => router.back()}><ArrowLeft className="h-4 w-4 mr-2" />Back</Button>
+          <div><h1 className="text-2xl font-bold text-foreground">New Service</h1><p className="text-muted-foreground mt-1">Create a new service</p></div>
+        </div>
+        <Button onClick={handleSubmit} disabled={saving}><Save className="h-4 w-4 mr-2" />{saving ? "Saving..." : "Save Service"}</Button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card>
+          <CardHeader><CardTitle>Service Details</CardTitle><CardDescription>Basic information about your service</CardDescription></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2"><Label htmlFor="title">Title *</Label><Input id="title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required /></div>
+              <div className="space-y-2"><Label htmlFor="slug">Slug *</Label><Input id="slug" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} required /></div>
+            </div>
+            <div className="space-y-2"><Label htmlFor="description">Description *</Label><textarea id="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full min-h-[120px] px-3 py-2 text-sm rounded-md border border-input bg-background" required /></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2"><Label htmlFor="priceRange">Price Range</Label><Input id="priceRange" value={formData.priceRange} onChange={(e) => setFormData({ ...formData, priceRange: e.target.value })} placeholder="$500 - $2000" /></div>
+              <div className="space-y-2"><Label htmlFor="icon">Icon (lucide icon name)</Label><Input id="icon" value={formData.icon} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} placeholder="briefcase" /></div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input type="checkbox" id="isActive" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="h-4 w-4 rounded border border-input" />
+              <Label htmlFor="isActive" className="cursor-pointer">Active</Label>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </div>
+  );
+}

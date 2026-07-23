@@ -1,18 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Protected route handling: /dashboard and /admin
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+    if (!token) {
+      const loginUrl = new URL('/auth/login', req.url);
+      loginUrl.searchParams.set('callbackUrl', req.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (pathname.startsWith('/admin')) {
+      const role = (token as any).role;
+      if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      }
+    }
+  }
+
   const response = NextResponse.next();
 
-  // Content Security Policy
+  // Content Security Policy including Cloudflare Turnstile & Stripe
   const cspHeader = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://challenges.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://api.stripe.com",
-    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+    "connect-src 'self' https://api.stripe.com https://challenges.cloudflare.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
     "media-src 'self' blob: https:",
     "worker-src 'self' blob:",
   ].join('; ');

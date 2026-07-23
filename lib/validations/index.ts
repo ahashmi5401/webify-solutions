@@ -12,3 +12,7 @@ export * from './pricing';
 export * from './career';
 export * from './inquiry';
 export * from './newsletter';
+export * from './user';
+export * from './media';
+export * from './settings';
+export * from './reorder';

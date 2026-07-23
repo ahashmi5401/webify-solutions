@@ -8,9 +8,10 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -21,7 +22,7 @@ export async function GET(
     const userRole = (session.user as any).role;
 
     const enrollment = await prisma.enrollment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: {
           select: {
@@ -59,9 +60,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -75,7 +77,7 @@ export async function PATCH(
     const validated = updateEnrollmentSchema.parse(body);
 
     const enrollment = await prisma.enrollment.update({
-      where: { id: params.id },
+      where: { id },
       data: validated,
       include: {
         course: true,
@@ -98,9 +100,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -111,7 +114,7 @@ export async function DELETE(
     requireAdminOrAbove(userRole);
 
     await prisma.enrollment.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Enrollment deleted successfully' });

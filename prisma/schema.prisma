@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -351,4 +350,13 @@ model Media {
   @@index([publicId])
   @@index([type])
   @@index([uploadedById])
+}
+
+model Settings {
+  id                String   @id @default(cuid())
+  siteName          String   @default("Webify Solutions")
+  siteDescription   String?  @db.Text
+  contactEmail      String?
+  maintenanceMode   Boolean  @default(false)
+  updatedAt         DateTime @updatedAt
 }

@@ -8,11 +8,12 @@ import { handleApiError, NotFoundError, ForbiddenError } from '@/lib/errors';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const career = await prisma.careerListing.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!career) {
@@ -37,9 +38,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -55,7 +57,7 @@ export async function PATCH(
     const validated = updateCareerListingSchema.parse(body);
 
     const career = await prisma.careerListing.update({
-      where: { id: params.id },
+      where: { id },
       data: validated,
     });
 
@@ -68,9 +70,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
@@ -83,7 +86,7 @@ export async function DELETE(
     }
 
     await prisma.careerListing.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Career listing deleted successfully' });
