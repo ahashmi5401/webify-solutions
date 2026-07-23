@@ -33,7 +33,7 @@ export default function MediaPage() {
       const res = await fetch("/api/media");
       if (!res.ok) throw new Error("Failed to fetch media");
       const data = await res.json();
-      setMedia(data || []);
+      setMedia(data.data || []);
     } catch (error) {
       console.error("Failed to fetch media:", error);
       setMedia([]);

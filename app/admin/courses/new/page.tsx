@@ -27,6 +27,7 @@ import {
   FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 
 interface Module {
   id?: string;
@@ -297,12 +298,12 @@ export default function NewCoursePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
-              <Input
-                id="thumbnailUrl"
+              <Label>Course Thumbnail</Label>
+              <ImageUploader
                 value={formData.thumbnailUrl}
-                onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                placeholder="https://example.com/thumbnail.jpg"
+                onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
+                onRemove={() => setFormData({ ...formData, thumbnailUrl: "" })}
+                disabled={saving}
               />
             </div>
 

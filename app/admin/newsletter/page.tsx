@@ -28,7 +28,7 @@ export default function NewsletterPage() {
       const res = await fetch("/api/newsletter");
       if (!res.ok) throw new Error("Failed to fetch subscribers");
       const data = await res.json();
-      setSubscribers(data || []);
+      setSubscribers(data.data || []);
     } catch (error) {
       console.error("Failed to fetch subscribers:", error);
       setSubscribers([]);

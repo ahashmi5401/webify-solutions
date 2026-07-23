@@ -6,6 +6,7 @@ export const serviceSchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters').max(5000),
   priceRange: z.string().max(100).optional(),
   icon: z.string().max(100).optional(),
+  imageUrl: z.string().url().optional().or(z.literal('')),
   isActive: z.boolean().default(true),
 });
 

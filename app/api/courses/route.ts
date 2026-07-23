@@ -101,8 +101,36 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = courseSchema.parse(body);
 
+    const { modules, ...courseData } = validated;
+
     const course = await prisma.course.create({
-      data: validated,
+      data: {
+        ...courseData,
+        thumbnailUrl: courseData.thumbnailUrl || null,
+        modules: {
+          create: modules.map((module: any) => ({
+            title: module.title,
+            order: module.order,
+            lessons: {
+              create: module.lessons.map((lesson: any) => ({
+                title: lesson.title,
+                content: lesson.content,
+                videoUrl: lesson.videoUrl,
+                order: lesson.order,
+                isFreePreview: lesson.isFreePreview,
+              })),
+            },
+          })),
+        },
+      },
+      include: {
+        modules: {
+          include: {
+            lessons: true,
+          },
+          orderBy: { order: 'asc' },
+        },
+      },
     });
 
     return NextResponse.json(course, { status: 201 });

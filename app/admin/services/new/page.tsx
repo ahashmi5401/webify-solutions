@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Save } from "lucide-react";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 
 export default function NewServicePage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({ title: "", slug: "", description: "", priceRange: "", icon: "", isActive: true });
+  const [formData, setFormData] = useState({ title: "", slug: "", description: "", priceRange: "", icon: "", imageUrl: "", isActive: true });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +55,15 @@ export default function NewServicePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2"><Label htmlFor="priceRange">Price Range</Label><Input id="priceRange" value={formData.priceRange} onChange={(e) => setFormData({ ...formData, priceRange: e.target.value })} placeholder="$500 - $2000" /></div>
               <div className="space-y-2"><Label htmlFor="icon">Icon (lucide icon name)</Label><Input id="icon" value={formData.icon} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} placeholder="briefcase" /></div>
+            </div>
+            <div className="space-y-2">
+              <Label>Service Image</Label>
+              <ImageUploader
+                value={formData.imageUrl}
+                onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                onRemove={() => setFormData({ ...formData, imageUrl: "" })}
+                disabled={saving}
+              />
             </div>
             <div className="flex items-center space-x-2">
               <input type="checkbox" id="isActive" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="h-4 w-4 rounded border border-input" />

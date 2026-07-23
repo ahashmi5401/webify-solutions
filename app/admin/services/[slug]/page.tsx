@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Save } from "lucide-react";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 
 export default function EditServicePage() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function EditServicePage() {
   const slug = params.slug as string;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({ title: "", slug: "", description: "", priceRange: "", icon: "", isActive: true });
+  const [formData, setFormData] = useState({ title: "", slug: "", description: "", priceRange: "", icon: "", imageUrl: "", isActive: true });
 
   useEffect(() => { fetchService(); }, [slug]);
 
@@ -23,7 +24,7 @@ export default function EditServicePage() {
       const res = await fetch(`/api/services/${slug}`);
       if (!res.ok) throw new Error("Failed to fetch service");
       const service = await res.json();
-      setFormData({ title: service.title, slug: service.slug, description: service.description, priceRange: service.priceRange || "", icon: service.icon || "", isActive: service.isActive });
+      setFormData({ title: service.title, slug: service.slug, description: service.description, priceRange: service.priceRange || "", icon: service.icon || "", imageUrl: service.imageUrl || "", isActive: service.isActive });
     } catch (error) {
       console.error("Failed to fetch service:", error);
     } finally {
@@ -73,6 +74,15 @@ export default function EditServicePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2"><Label htmlFor="priceRange">Price Range</Label><Input id="priceRange" value={formData.priceRange} onChange={(e) => setFormData({ ...formData, priceRange: e.target.value })} /></div>
               <div className="space-y-2"><Label htmlFor="icon">Icon (lucide icon name)</Label><Input id="icon" value={formData.icon} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} /></div>
+            </div>
+            <div className="space-y-2">
+              <Label>Service Image</Label>
+              <ImageUploader
+                value={formData.imageUrl}
+                onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                onRemove={() => setFormData({ ...formData, imageUrl: "" })}
+                disabled={saving}
+              />
             </div>
             <div className="flex items-center space-x-2">
               <input type="checkbox" id="isActive" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="h-4 w-4 rounded border border-input" />

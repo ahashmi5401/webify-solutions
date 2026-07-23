@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Save } from "lucide-react";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 
 export default function EditBlogPostPage() {
   const { data: session } = useSession();
@@ -168,11 +169,12 @@ export default function EditBlogPostPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="coverImage">Cover Image URL</Label>
-              <Input
-                id="coverImage"
+              <Label>Cover Image</Label>
+              <ImageUploader
                 value={formData.coverImage}
-                onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
+                onChange={(url) => setFormData({ ...formData, coverImage: url })}
+                onRemove={() => setFormData({ ...formData, coverImage: "" })}
+                disabled={saving}
               />
             </div>
 

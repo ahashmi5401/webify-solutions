@@ -24,6 +24,7 @@ import {
   ChevronUp,
   ChevronDown
 } from "lucide-react";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 
 interface Module {
   id?: string;
@@ -321,11 +322,12 @@ export default function EditCoursePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
-              <Input
-                id="thumbnailUrl"
+              <Label>Course Thumbnail</Label>
+              <ImageUploader
                 value={formData.thumbnailUrl}
-                onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
+                onRemove={() => setFormData({ ...formData, thumbnailUrl: "" })}
+                disabled={saving}
               />
             </div>
 

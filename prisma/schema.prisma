@@ -200,6 +200,7 @@ model Service {
   description String   @db.Text
   priceRange  String?
   icon        String?
+  imageUrl    String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
