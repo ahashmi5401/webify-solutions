@@ -29,11 +29,8 @@ interface PortfolioDetailProps {
 
 async function getPortfolioBySlug(slug: string) {
   try {
-    const res = await fetch(`http://localhost:3000/api/portfolio/${slug}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const { getPortfolioBySlug: fetchPortfolio } = await import('@/lib/data/portfolio');
+    return await fetchPortfolio(slug);
   } catch {
     return null;
   }
@@ -41,9 +38,8 @@ async function getPortfolioBySlug(slug: string) {
 
 async function getRelatedPortfolioItems(currentSlug: string) {
   try {
-    const res = await fetch("http://localhost:3000/api/portfolio", { cache: "no-store" });
-    if (!res.ok) return [];
-    const items = await res.json();
+    const { getPortfolioItems } = await import('@/lib/data/portfolio');
+    const items = await getPortfolioItems();
     return items.filter((item: any) => item.slug !== currentSlug).slice(0, 3);
   } catch {
     return [];
@@ -129,6 +125,15 @@ export default async function PortfolioDetailPage({ params }: PortfolioDetailPro
 
           {/* Header */}
           <div className="space-y-4 max-w-4xl">
+            {portfolio.thumbnailUrl && (
+              <div className="aspect-video w-full overflow-hidden rounded-lg bg-secondary">
+                <img
+                  src={portfolio.thumbnailUrl}
+                  alt={portfolio.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
             <Badge variant="accent">Case Study</Badge>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
               {portfolio.title}
@@ -253,6 +258,24 @@ export default async function PortfolioDetailPage({ params }: PortfolioDetailPro
               ))}
             </div>
           </section>
+
+          {/* Gallery */}
+          {portfolio.images && portfolio.images.length > 0 && (
+            <section className="max-w-4xl space-y-4 pt-4">
+              <h2 className="text-2xl font-bold tracking-tight border-b border-border pb-3">Project Gallery</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {portfolio.images.map((imageUrl: string, index: number) => (
+                  <div key={index} className="aspect-video overflow-hidden rounded-lg bg-secondary">
+                    <img
+                      src={imageUrl}
+                      alt={`${portfolio.title} gallery image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* CTA */}
           <section className="rounded-xl border border-primary/20 bg-primary/5 p-8 sm:p-12 text-center space-y-4 max-w-4xl">

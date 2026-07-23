@@ -22,11 +22,8 @@ interface ServiceDetailProps {
 
 async function getServiceBySlug(slug: string) {
   try {
-    const res = await fetch(`http://localhost:3000/api/services/${slug}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const { getServiceBySlug } = await import('@/lib/data/services');
+    return await getServiceBySlug(slug);
   } catch {
     return null;
   }

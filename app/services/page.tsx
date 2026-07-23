@@ -10,9 +10,8 @@ import * as Icons from "lucide-react";
 
 async function getServices() {
   try {
-    const res = await fetch("http://localhost:3000/api/services", { cache: "no-store" });
-    if (!res.ok) return [];
-    return await res.json();
+    const { getServices } = await import('@/lib/data/services');
+    return await getServices();
   } catch {
     return [];
   }

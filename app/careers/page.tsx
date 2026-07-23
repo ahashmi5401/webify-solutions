@@ -48,9 +48,8 @@ export const metadata: Metadata = {
 
 async function getCareerListings() {
   try {
-    const res = await fetch("http://localhost:3000/api/careers", { cache: "no-store" });
-    if (!res.ok) return [];
-    return await res.json();
+    const { getCareerListings } = await import('@/lib/data/careers');
+    return await getCareerListings();
   } catch {
     return [];
   }

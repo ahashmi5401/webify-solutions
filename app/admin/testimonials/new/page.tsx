@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Save } from "lucide-react";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 
 export default function NewTestimonialPage() {
   const router = useRouter();
@@ -51,7 +52,14 @@ export default function NewTestimonialPage() {
             </div>
             <div className="space-y-2"><Label htmlFor="company">Company</Label><Input id="company" value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} /></div>
             <div className="space-y-2"><Label htmlFor="message">Message *</Label><textarea id="message" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full min-h-[120px] px-3 py-2 text-sm rounded-md border border-input bg-background" required /></div>
-            <div className="space-y-2"><Label htmlFor="avatarUrl">Avatar URL</Label><Input id="avatarUrl" value={formData.avatarUrl} onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })} /></div>
+            <div className="space-y-2">
+              <Label>Avatar</Label>
+              <ImageUploader
+                value={formData.avatarUrl}
+                onChange={(url) => setFormData({ ...formData, avatarUrl: url })}
+                onRemove={() => setFormData({ ...formData, avatarUrl: "" })}
+              />
+            </div>
             <div className="flex items-center space-x-2">
               <input type="checkbox" id="isPublished" checked={formData.isPublished} onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })} className="h-4 w-4 rounded border border-input" />
               <Label htmlFor="isPublished" className="cursor-pointer">Published</Label>

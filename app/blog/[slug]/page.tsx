@@ -36,11 +36,8 @@ interface BlogDetailProps {
 
 async function getBlogPostBySlug(slug: string) {
   try {
-    const res = await fetch(`http://localhost:3000/api/blog/${slug}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const { getBlogPostBySlug: fetchPost } = await import('@/lib/data/blog');
+    return await fetchPost(slug);
   } catch {
     return null;
   }
@@ -48,11 +45,8 @@ async function getBlogPostBySlug(slug: string) {
 
 async function getRelatedPosts(category: string, currentSlug: string) {
   try {
-    const res = await fetch(`http://localhost:3000/api/blog?category=${category}&limit=3`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
+    const { getBlogPosts } = await import('@/lib/data/blog');
+    const data = await getBlogPosts({ category, limit: 3 });
     return data.posts?.filter((p: any) => p.slug !== currentSlug).slice(0, 3) || [];
   } catch {
     return [];
@@ -78,7 +72,7 @@ export async function generateMetadata({ params }: BlogDetailProps): Promise<Met
       url: `${SITE_URL}/blog/${post.slug}`,
       title: post.title,
       description: post.content?.slice(0, 160).replace(/[#*`]/g, "") || "",
-      publishedTime: post.publishedAt,
+      publishedTime: post.publishedAt ? post.publishedAt.toISOString() : undefined,
       authors: [post.author?.name || "Webify Solutions"],
       images: post.coverImage ? [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }] : [{ url: "/og-default.png", width: 1200, height: 630, alt: "Webify Solutions" }],
     },

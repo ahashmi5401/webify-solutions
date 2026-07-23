@@ -37,9 +37,8 @@ export const metadata: Metadata = {
 
 async function getPricingPlans() {
   try {
-    const res = await fetch("http://localhost:3000/api/pricing", { cache: "no-store" });
-    if (!res.ok) return [];
-    return await res.json();
+    const { getPricingPlans } = await import('@/lib/data/pricing');
+    return await getPricingPlans();
   } catch {
     return [];
   }
@@ -47,9 +46,8 @@ async function getPricingPlans() {
 
 async function getFAQs() {
   try {
-    const res = await fetch("http://localhost:3000/api/faq?category=pricing", { cache: "no-store" });
-    if (!res.ok) return [];
-    return await res.json();
+    const { getFaqs } = await import('@/lib/data/faq');
+    return await getFaqs('pricing');
   } catch {
     return [];
   }

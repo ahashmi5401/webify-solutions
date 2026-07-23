@@ -6,12 +6,13 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Plus, X } from "lucide-react";
+import { ImageUploader } from "@/components/shared/ImageUploader";
 
 export default function NewPortfolioPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({ title: "", slug: "", description: "", techUsed: "", resultsSummary: "", clientTestimonial: "", isPublished: false });
+  const [formData, setFormData] = useState({ title: "", slug: "", description: "", thumbnailUrl: "", images: [] as string[], techUsed: "", resultsSummary: "", clientTestimonial: "", isPublished: false });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +21,11 @@ export default function NewPortfolioPage() {
       const res = await fetch("/api/portfolio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, techUsed: formData.techUsed.split(",").map(t => t.trim()).filter(t => t) }),
+        body: JSON.stringify({ 
+          ...formData, 
+          techUsed: formData.techUsed.split(",").map(t => t.trim()).filter(t => t),
+          images: formData.images 
+        }),
       });
       if (!res.ok) throw new Error("Failed to create portfolio item");
       const item = await res.json();
@@ -30,6 +35,14 @@ export default function NewPortfolioPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const addGalleryImage = (url: string) => {
+    setFormData({ ...formData, images: [...formData.images, url] });
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setFormData({ ...formData, images: formData.images.filter((_, i) => i !== index) });
   };
 
   return (
@@ -50,6 +63,40 @@ export default function NewPortfolioPage() {
               <div className="space-y-2"><Label htmlFor="slug">Slug *</Label><Input id="slug" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} required /></div>
             </div>
             <div className="space-y-2"><Label htmlFor="description">Description *</Label><textarea id="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full min-h-[120px] px-3 py-2 text-sm rounded-md border border-input bg-background" required /></div>
+            <div className="space-y-2">
+              <Label>Thumbnail Image</Label>
+              <ImageUploader
+                value={formData.thumbnailUrl}
+                onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
+                onRemove={() => setFormData({ ...formData, thumbnailUrl: "" })}
+              />
+            </div>
+            <div className="space-y-4">
+              <Label>Gallery Images</Label>
+              {formData.images.map((url, index) => (
+                <div key={index} className="relative">
+                  <ImageUploader
+                    value={url}
+                    onChange={(newUrl) => {
+                      const updated = [...formData.images];
+                      updated[index] = newUrl;
+                      setFormData({ ...formData, images: updated });
+                    }}
+                    onRemove={() => removeGalleryImage(index)}
+                  />
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => addGalleryImage("")}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Gallery Image
+              </Button>
+            </div>
             <div className="space-y-2"><Label htmlFor="techUsed">Tech Stack (comma-separated)</Label><Input id="techUsed" value={formData.techUsed} onChange={(e) => setFormData({ ...formData, techUsed: e.target.value })} placeholder="React, Next.js, TypeScript" /></div>
             <div className="space-y-2"><Label htmlFor="resultsSummary">Results Summary</Label><textarea id="resultsSummary" value={formData.resultsSummary} onChange={(e) => setFormData({ ...formData, resultsSummary: e.target.value })} className="w-full min-h-[80px] px-3 py-2 text-sm rounded-md border border-input bg-background" /></div>
             <div className="space-y-2"><Label htmlFor="clientTestimonial">Client Testimonial</Label><textarea id="clientTestimonial" value={formData.clientTestimonial} onChange={(e) => setFormData({ ...formData, clientTestimonial: e.target.value })} className="w-full min-h-[80px] px-3 py-2 text-sm rounded-md border border-input bg-background" /></div>

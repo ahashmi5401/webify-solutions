@@ -47,19 +47,14 @@ async function getBlogPosts(params: {
   search?: string;
 }) {
   try {
-    const query = new URLSearchParams();
-    if (params.page) query.set("page", params.page);
-    if (params.limit) query.set("limit", params.limit || "9");
-    if (params.category) query.set("category", params.category);
-    if (params.tag) query.set("tag", params.tag);
-    if (params.search) query.set("search", params.search);
-
-    const res = await fetch(`http://localhost:3000/api/blog?${query.toString()}`, {
-      cache: "no-store",
+    const { getBlogPosts } = await import('@/lib/data/blog');
+    return await getBlogPosts({
+      page: params.page ? parseInt(params.page) : 1,
+      limit: params.limit ? parseInt(params.limit) : 9,
+      category: params.category,
+      tag: params.tag,
+      search: params.search,
     });
-
-    if (!res.ok) return { posts: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
-    return await res.json();
   } catch {
     return { posts: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
   }

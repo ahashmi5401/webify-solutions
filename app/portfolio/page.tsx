@@ -31,9 +31,8 @@ export const metadata: Metadata = {
 
 async function getPortfolioItems() {
   try {
-    const res = await fetch("http://localhost:3000/api/portfolio", { cache: "no-store" });
-    if (!res.ok) return [];
-    return await res.json();
+    const { getPortfolioItems } = await import('@/lib/data/portfolio');
+    return await getPortfolioItems();
   } catch {
     return [];
   }
@@ -61,6 +60,19 @@ export default async function PortfolioPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {portfolioItems.map((item: any) => (
               <Card key={item.id} className="flex flex-col hover:shadow-md transition-shadow">
+                {item.thumbnailUrl ? (
+                  <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-secondary">
+                    <img
+                      src={item.thumbnailUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-secondary flex items-center justify-center">
+                    <Briefcase className="h-12 w-12 text-muted-foreground/50" />
+                  </div>
+                )}
                 <CardHeader className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Badge variant="secondary">Case Study</Badge>

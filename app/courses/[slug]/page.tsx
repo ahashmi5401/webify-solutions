@@ -30,11 +30,8 @@ interface CourseDetailProps {
 
 async function getCourseBySlug(slug: string) {
   try {
-    const res = await fetch(`http://localhost:3000/api/courses/${slug}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const { getCourseBySlug: fetchCourse } = await import('@/lib/data/courses');
+    return await fetchCourse(slug);
   } catch {
     return null;
   }
@@ -42,11 +39,8 @@ async function getCourseBySlug(slug: string) {
 
 async function getRelatedCourses(category: string, currentSlug: string) {
   try {
-    const res = await fetch(`http://localhost:3000/api/courses?category=${encodeURIComponent(category)}&limit=3`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
+    const { getCourses } = await import('@/lib/data/courses');
+    const data = await getCourses({ category, limit: 3 });
     return (data.courses || []).filter((c: any) => c.slug !== currentSlug);
   } catch {
     return [];
@@ -73,15 +67,15 @@ export async function generateMetadata({ params }: CourseDetailProps): Promise<M
       url: pageUrl,
       title: `${course.title} | Webify Solutions`,
       description,
-      images: course.imageUrl
-        ? [{ url: course.imageUrl, width: 1200, height: 630, alt: course.title }]
+      images: course.thumbnailUrl
+        ? [{ url: course.thumbnailUrl, width: 1200, height: 630, alt: course.title }]
         : [{ url: "/og-default.png", width: 1200, height: 630, alt: course.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${course.title} | Webify Solutions`,
       description,
-      images: [course.imageUrl || "/og-default.png"],
+      images: [course.thumbnailUrl || "/og-default.png"],
     },
   };
 }
@@ -120,12 +114,10 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
     name: course.title,
     description: course.description,
     slug: course.slug,
-    price: course.price,
+    price: Number(course.price),
     currency: "USD",
-    imageUrl: course.imageUrl,
+    imageUrl: course.thumbnailUrl,
     level: course.level,
-    rating: course.rating ?? null,
-    reviewCount: course.reviewCount ?? null,
   });
 
   const breadcrumbSchema = buildBreadcrumbSchema([
@@ -146,6 +138,15 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
         {/* Header Hero Card */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-4">
+            {course.thumbnailUrl && (
+              <div className="aspect-video w-full overflow-hidden rounded-lg bg-secondary">
+                <img
+                  src={course.thumbnailUrl}
+                  alt={course.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
             <div className="flex items-center space-x-2">
               <Badge variant="accent">{course.category}</Badge>
               <Badge variant={levelVariantMap[course.level] || "outline"}>{course.level}</Badge>
@@ -178,7 +179,7 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
             <CardHeader>
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Course Fee</span>
               <div className="text-3xl font-extrabold text-foreground">
-                ${typeof course.price === "number" ? course.price.toFixed(2) : course.price}
+                ${Number(course.price).toFixed(2)}
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -186,7 +187,7 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
                 courseId={course.id}
                 slug={course.slug}
                 isEnrolled={isEnrolled}
-                price={course.price}
+                price={Number(course.price)}
               />
               <p className="text-[11px] text-muted-foreground text-center">
                 Full lifetime access • Instant enrollment confirmation

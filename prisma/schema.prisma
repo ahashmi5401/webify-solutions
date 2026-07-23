@@ -214,6 +214,8 @@ model Portfolio {
   title            String
   slug             String   @unique
   description      String   @db.Text
+  thumbnailUrl     String?
+  images           String[]
   techUsed         String[]
   resultsSummary   String   @db.Text
   clientTestimonial String? @db.Text

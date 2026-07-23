@@ -51,19 +51,14 @@ async function getCourses(params: {
   search?: string;
 }) {
   try {
-    const query = new URLSearchParams();
-    if (params.page) query.set("page", params.page);
-    if (params.limit) query.set("limit", params.limit || "6");
-    if (params.category) query.set("category", params.category);
-    if (params.level) query.set("level", params.level);
-    if (params.search) query.set("search", params.search);
-
-    const res = await fetch(`http://localhost:3000/api/courses?${query.toString()}`, {
-      cache: "no-store",
+    const { getCourses } = await import('@/lib/data/courses');
+    return await getCourses({
+      page: params.page ? parseInt(params.page) : 1,
+      limit: params.limit ? parseInt(params.limit) : 6,
+      category: params.category,
+      level: params.level,
+      search: params.search,
     });
-
-    if (!res.ok) return { courses: [], pagination: { page: 1, limit: 6, total: 0, totalPages: 0 } };
-    return await res.json();
   } catch {
     return { courses: [], pagination: { page: 1, limit: 6, total: 0, totalPages: 0 } };
   }
@@ -103,6 +98,19 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course: any) => (
               <Card key={course.id} className="flex flex-col justify-between hover:shadow-md transition-shadow">
+                {course.thumbnailUrl ? (
+                  <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-secondary">
+                    <img
+                      src={course.thumbnailUrl}
+                      alt={course.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-secondary flex items-center justify-center">
+                    <BookOpen className="h-12 w-12 text-muted-foreground/50" />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-center justify-between mb-2">
                     <Badge variant="accent">{course.category}</Badge>

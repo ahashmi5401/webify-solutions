@@ -48,10 +48,8 @@ export const metadata: Metadata = {
 
 async function getServices() {
   try {
-    const res = await fetch("http://localhost:3000/api/services", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data.slice(0, 4) : [];
+    const services = await (await import('@/lib/data/services')).getServices();
+    return services.slice(0, 4);
   } catch {
     return [];
   }
@@ -59,10 +57,8 @@ async function getServices() {
 
 async function getTestimonials() {
   try {
-    const res = await fetch("http://localhost:3000/api/testimonials", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data.slice(0, 3) : [];
+    const testimonials = await (await import('@/lib/data/testimonials')).getTestimonials();
+    return testimonials.slice(0, 3);
   } catch {
     return [];
   }
@@ -70,10 +66,8 @@ async function getTestimonials() {
 
 async function getPricing() {
   try {
-    const res = await fetch("http://localhost:3000/api/pricing", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data.slice(0, 3) : [];
+    const pricing = await (await import('@/lib/data/pricing')).getPricingPlans();
+    return pricing.slice(0, 3);
   } catch {
     return [];
   }
@@ -81,10 +75,8 @@ async function getPricing() {
 
 async function getFaqs() {
   try {
-    const res = await fetch("http://localhost:3000/api/faq", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data.slice(0, 5) : [];
+    const faqs = await (await import('@/lib/data/faq')).getFaqs();
+    return faqs.slice(0, 5);
   } catch {
     return [];
   }
@@ -92,10 +84,8 @@ async function getFaqs() {
 
 async function getPortfolio() {
   try {
-    const res = await fetch("http://localhost:3000/api/portfolio", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data.slice(0, 3) : [];
+    const portfolio = await (await import('@/lib/data/portfolio')).getPortfolioItems();
+    return portfolio.slice(0, 3);
   } catch {
     return [];
   }
@@ -313,9 +303,19 @@ export default async function HomePage() {
                     </p>
                   </CardContent>
                   <CardFooter className="flex items-center space-x-3">
-                    <div className="h-9 w-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-xs">
-                      {t.name.substring(0, 2).toUpperCase()}
-                    </div>
+                    {t.avatarUrl ? (
+                      <div className="h-9 w-9 rounded-full overflow-hidden bg-primary/10">
+                        <img
+                          src={t.avatarUrl}
+                          alt={t.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-9 w-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-xs">
+                        {t.name.substring(0, 2).toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <p className="text-xs font-semibold text-foreground">{t.name}</p>
                       <p className="text-[11px] text-muted-foreground">{t.role} {t.company ? `at ${t.company}` : ""}</p>
