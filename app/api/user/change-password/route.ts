@@ -4,7 +4,7 @@ import { changePasswordSchema } from '@/lib/validations';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { handleApiError, ForbiddenError, ValidationError } from '@/lib/errors';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export async function PATCH(req: NextRequest) {
   try {

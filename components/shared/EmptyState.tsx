@@ -14,7 +14,12 @@ import {
   Zap,
   Shield,
   Building2,
-  ArrowRight
+  ArrowRight,
+  Layers,
+  BookOpen,
+  CheckCircle2,
+  Sparkles,
+  Code2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,10 +38,15 @@ const iconMap: Record<string, React.ElementType> = {
   shield: Shield,
   building: Building2,
   arrowRight: ArrowRight,
+  layers: Layers,
+  bookOpen: BookOpen,
+  checkCircle2: CheckCircle2,
+  sparkles: Sparkles,
+  code2: Code2,
 };
 
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
-  icon?: string;
+  icon?: string | React.ElementType;
   title?: string;
   description?: string;
   actionLabel?: string;
@@ -44,7 +54,7 @@ interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function EmptyState({
-  icon: iconName = "folder",
+  icon: iconProp = "folder",
   title = "No results found",
   description = "We couldn't find anything matching your search. Try adjusting your filters.",
   actionLabel,
@@ -52,7 +62,7 @@ export function EmptyState({
   className,
   ...props
 }: EmptyStateProps) {
-  const Icon = iconMap[iconName] || FolderOpen;
+  const Icon = typeof iconProp === 'string' ? (iconMap[iconProp] || FolderOpen) : iconProp;
 
   return (
     <div

@@ -49,16 +49,37 @@ export default function AdminDashboardPage() {
     try {
       const userRole = (session?.user as any)?.role;
       
-      // Fetch KPI data
-      const [coursesRes, blogRes, inquiriesRes] = await Promise.all([
-        fetch("/api/courses?page=1&limit=1"),
-        fetch("/api/blog?page=1&limit=1"),
-        fetch("/api/inquiries"),
-      ]);
-
-      const coursesData = await coursesRes.json();
-      const blogData = await blogRes.json();
-      const inquiriesData = await inquiriesRes.json();
+      // Fetch KPI data with error handling
+      let coursesData = { pagination: { total: 0 } };
+      let blogData = { pagination: { total: 0 } };
+      let inquiriesData = [];
+      
+      try {
+        const coursesRes = await fetch("/api/courses?page=1&limit=1");
+        if (coursesRes.ok) {
+          coursesData = await coursesRes.json();
+        }
+      } catch (e) {
+        console.error("Failed to fetch courses:", e);
+      }
+      
+      try {
+        const blogRes = await fetch("/api/blog?page=1&limit=1");
+        if (blogRes.ok) {
+          blogData = await blogRes.json();
+        }
+      } catch (e) {
+        console.error("Failed to fetch blog:", e);
+      }
+      
+      try {
+        const inquiriesRes = await fetch("/api/inquiries");
+        if (inquiriesRes.ok) {
+          inquiriesData = await inquiriesRes.json();
+        }
+      } catch (e) {
+        console.error("Failed to fetch inquiries:", e);
+      }
 
       const kpiData: KPICard[] = [
         {
@@ -86,8 +107,15 @@ export default function AdminDashboardPage() {
 
       // Only add enrollments for ADMIN and SUPER_ADMIN
       if (userRole === "ADMIN" || userRole === "SUPER_ADMIN") {
-        const enrollmentsRes = await fetch("/api/enrollments");
-        const enrollmentsData = await enrollmentsRes.json();
+        let enrollmentsData = [];
+        try {
+          const enrollmentsRes = await fetch("/api/enrollments");
+          if (enrollmentsRes.ok) {
+            enrollmentsData = await enrollmentsRes.json();
+          }
+        } catch (e) {
+          console.error("Failed to fetch enrollments:", e);
+        }
         
         kpiData.push({
           title: "Total Enrollments",

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { CheckCircle2, XCircle } from "lucide-react";
 
-export default function VerifyEmailPage() {
+function VerifyEmailForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -111,4 +111,8 @@ export default function VerifyEmailPage() {
       </Container>
     </div>
   );
+}
+
+export default function VerifyEmailPage() {
+  return <VerifyEmailForm />;
 }

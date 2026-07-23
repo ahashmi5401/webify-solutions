@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +10,34 @@ import { Label } from "@/components/ui/label";
 import { Save, Settings } from "lucide-react";
 
 export default function SettingsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
+      return;
+    }
+
+    const userRole = (session?.user as any)?.role;
+    if (userRole !== "SUPER_ADMIN") {
+      router.push("/admin");
+      return;
+    }
+  }, [status, session, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const userRole = (session?.user as any)?.role;
+  if (userRole !== "SUPER_ADMIN") {
+    return null;
+  }
   return (
     <div className="space-y-6">
       <div>

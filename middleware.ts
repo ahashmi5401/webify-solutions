@@ -17,13 +17,20 @@ export async function middleware(req: NextRequest) {
 
     if (pathname.startsWith('/admin')) {
       const role = (token as any).role;
-      if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
+      // Only require that user has admin dashboard access (EDITOR, ADMIN, or SUPER_ADMIN)
+      // Fine-grained role checks happen at the page/API level via lib/rbac.ts
+      if (role !== 'EDITOR' && role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
         return NextResponse.redirect(new URL('/dashboard', req.url));
       }
     }
   }
 
   const response = NextResponse.next();
+
+  // Add custom header to indicate admin route for layout conditional rendering
+  if (pathname.startsWith('/admin')) {
+    response.headers.set('x-is-admin-route', 'true');
+  }
 
   // Content Security Policy including Cloudflare Turnstile & Stripe
   const cspHeader = [

@@ -8,7 +8,7 @@ import { handleApiError, ForbiddenError, NotFoundError } from '@/lib/errors';
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -20,8 +20,10 @@ export async function DELETE(
     const userRole = (session.user as any).role;
     requireEditorOrAbove(userRole);
 
+    const { id } = await params;
+
     const media = await prisma.media.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!media) {
@@ -42,7 +44,7 @@ export async function DELETE(
 
     // Delete from database
     await prisma.media.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Media deleted successfully' });

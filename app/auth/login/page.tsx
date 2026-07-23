@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
@@ -183,4 +183,8 @@ export default function LoginPage() {
       </Container>
     </div>
   );
+}
+
+export default function LoginPage() {
+  return <LoginForm />;
 }

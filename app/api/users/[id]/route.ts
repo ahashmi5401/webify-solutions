@@ -8,7 +8,7 @@ import { handleApiError, ForbiddenError, NotFoundError, ConflictError } from '@/
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -21,13 +21,14 @@ export async function PATCH(
     requireSuperAdmin(userRole);
 
     const currentUserId = (session.user as any).id;
-    const targetUserId = params.id;
+    const { id: targetUserId } = await params;
+
+    // Parse and validate request body exactly once
+    const body = await req.json();
+    const validated = updateUserRoleSchema.parse(body);
 
     // Prevent self-demotion
     if (currentUserId === targetUserId) {
-      const body = await req.json();
-      const validated = updateUserRoleSchema.parse(body);
-      
       if (validated.role !== 'SUPER_ADMIN') {
         throw new ConflictError('Cannot demote yourself from Super Admin role');
       }
@@ -49,17 +50,11 @@ export async function PATCH(
       });
 
       if (superAdminCount === 1) {
-        const body = await req.json();
-        const validated = updateUserRoleSchema.parse(body);
-        
         if (validated.role !== 'SUPER_ADMIN') {
           throw new ConflictError('Cannot remove the last Super Admin');
         }
       }
     }
-
-    const body = await req.json();
-    const validated = updateUserRoleSchema.parse(body);
 
     const updatedUser = await prisma.user.update({
       where: { id: targetUserId },

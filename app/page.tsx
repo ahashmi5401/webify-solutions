@@ -152,31 +152,7 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* 2. Company Stats Strip */}
-      <section className="border-y border-border bg-card/60 py-8">
-        <Container>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="space-y-1">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">50+</div>
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Projects Delivered</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">1,200+</div>
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Students Trained</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">99.9%</div>
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">System Reliability</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl font-extrabold tracking-tight text-foreground">24/7</div>
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dedicated Support</div>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* 3. Services Overview */}
+      {/* 2. Services Overview */}
       <section className="space-y-8">
         <Container className="space-y-8">
           <div className="text-center space-y-2 max-w-2xl mx-auto">

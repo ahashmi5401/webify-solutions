@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/shared/Navbar";
 import { Footer } from "@/components/shared/Footer";
 import { Providers } from "./providers";
+import { headers } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -78,11 +79,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const isAdminRoute = headersList.get('x-is-admin-route') === 'true';
+
   return (
     <html
       lang="en"
@@ -90,9 +94,9 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans selection:bg-primary/20 selection:text-primary">
         <Providers>
-          <Navbar />
+          {!isAdminRoute && <Navbar />}
           <main className="flex-1 w-full">{children}</main>
-          <Footer />
+          {!isAdminRoute && <Footer />}
         </Providers>
       </body>
     </html>

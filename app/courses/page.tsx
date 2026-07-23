@@ -135,7 +135,7 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
           </div>
         ) : (
           <EmptyState
-            icon={Layers}
+            icon="layers"
             title="No courses found"
             description="No courses match your active search or filter selection. Try clearing filters to see all courses."
           />

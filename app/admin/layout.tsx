@@ -4,16 +4,16 @@ import * as React from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  FileText, 
-  Briefcase, 
-  Image as ImageIcon, 
-  MessageSquare, 
-  Users, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  BookOpen,
+  FileText,
+  Briefcase,
+  Image as ImageIcon,
+  MessageSquare,
+  Users,
+  Settings,
+  LogOut,
   ExternalLink,
   Menu,
   X
@@ -21,15 +21,16 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { useEffect } from "react";
 
 interface NavItem {
   title: string;
@@ -52,7 +53,7 @@ const navItems: NavItem[] = [
   { title: "Newsletter", href: "/admin/newsletter", icon: MessageSquare, requiredRole: "EDITOR" },
   { title: "Media", href: "/admin/media", icon: ImageIcon, requiredRole: "EDITOR" },
   { title: "Users", href: "/admin/users", icon: Users, requiredRole: "SUPER_ADMIN" },
-  { title: "Settings", href: "/admin/settings", icon: Settings, requiredRole: "ADMIN" },
+  { title: "Settings", href: "/admin/settings", icon: Settings, requiredRole: "SUPER_ADMIN" },
 ];
 
 const ROLE_HIERARCHY: Record<string, number> = {
@@ -156,23 +157,21 @@ export default function AdminLayout({
         <NavContent />
       </aside>
 
-      {/* Mobile Sidebar */}
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-64 p-0">
-          <NavContent />
-        </SheetContent>
-      </Sheet>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
         <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
           <div className="flex items-center space-x-4">
-            <SheetTrigger asChild onClick={() => setMobileOpen(true)}>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)}>
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0">
+                <NavContent />
+              </SheetContent>
+            </Sheet>
             <h1 className="text-lg font-semibold text-foreground">
               {filteredNavItems.find(item => item.href === pathname)?.title || "Dashboard"}
             </h1>

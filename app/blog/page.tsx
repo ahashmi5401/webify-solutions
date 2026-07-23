@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Calendar, User, ChevronLeft, ChevronRight, FileText } from "lucide-react";
+import { Calendar, User, ChevronLeft, ChevronRight } from "lucide-react";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://webify-solutions.vercel.app";
 
@@ -165,7 +165,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
         ) : (
           <EmptyState
-            icon={FileText}
+            icon="file"
             title="No articles found"
             description="No blog posts match your current filter. Try selecting a different category or tag."
           />

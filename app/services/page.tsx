@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/comp
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Code2, ArrowRight, Layers, Sparkles } from "lucide-react";
+import { Code2, ArrowRight, Sparkles, Layers } from "lucide-react";
 
 async function getServices() {
   try {

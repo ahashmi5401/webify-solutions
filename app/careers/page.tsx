@@ -16,6 +16,15 @@ import {
   Building2
 } from "lucide-react";
 
+const iconMap: Record<string, React.ElementType> = {
+  zap: Zap,
+  clock: Clock,
+  users: Users,
+  heart: Heart,
+  shield: Shield,
+  building: Building2,
+};
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://webify-solutions.vercel.app";
 
 export const metadata: Metadata = {
@@ -49,32 +58,32 @@ async function getCareerListings() {
 
 const benefits = [
   {
-    icon: Zap,
+    icon: "zap",
     title: "Competitive Salary",
     description: "Market-leading compensation with regular performance reviews and equity opportunities.",
   },
   {
-    icon: Clock,
+    icon: "clock",
     title: "Flexible Work",
     description: "Remote-first culture with flexible hours. Work from anywhere in the world.",
   },
   {
-    icon: Shield,
+    icon: "shield",
     title: "Health Benefits",
     description: "Comprehensive health, dental, and vision insurance for you and your family.",
   },
   {
-    icon: Users,
+    icon: "users",
     title: "Learning Budget",
     description: "Annual budget for courses, conferences, books, and tools to help you grow.",
   },
   {
-    icon: Heart,
+    icon: "heart",
     title: "Unlimited PTO",
     description: "Take the time you need. We trust our team to manage their work-life balance.",
   },
   {
-    icon: Building2,
+    icon: "building",
     title: "Home Office Stipend",
     description: "Budget for setting up your home office with the equipment you need.",
   },
@@ -121,19 +130,22 @@ export default async function CareersPage() {
         <section className="space-y-6">
           <h2 className="text-2xl font-bold tracking-tight border-b border-border pb-3">Benefits & Perks</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {benefits.map((benefit, idx) => (
-              <Card key={idx} className="hover:shadow-md transition-shadow">
-                <CardHeader className="space-y-3">
-                  <div className="p-2.5 rounded-lg bg-primary/10 text-primary w-fit">
-                    <benefit.icon className="h-5 w-5" />
-                  </div>
-                  <CardTitle className="text-base">{benefit.title}</CardTitle>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {benefit.description}
-                  </p>
-                </CardHeader>
-              </Card>
-            ))}
+            {benefits.map((benefit, idx) => {
+              const Icon = iconMap[benefit.icon as keyof typeof iconMap] || Zap;
+              return (
+                <Card key={idx} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="space-y-3">
+                    <div className="p-2.5 rounded-lg bg-primary/10 text-primary w-fit">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <CardTitle className="text-base">{benefit.title}</CardTitle>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {benefit.description}
+                    </p>
+                  </CardHeader>
+                </Card>
+              );
+            })}
           </div>
         </section>
 

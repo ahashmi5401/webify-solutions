@@ -24,7 +24,7 @@ const extendedResetPasswordSchema = resetPasswordSchema.extend({
 
 type FormInput = z.infer<typeof extendedResetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -144,5 +144,13 @@ export default function ResetPasswordPage() {
         </Card>
       </Container>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <React.Suspense fallback={<div className="py-12 sm:py-16 flex items-center justify-center min-h-[calc(100vh-8rem)]"><Container className="max-w-md"><div className="text-center">Loading...</div></Container></div>}>
+      <ResetPasswordForm />
+    </React.Suspense>
   );
 }
